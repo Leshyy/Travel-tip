@@ -1,15 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ES6</title>
-</head>
-<body>
-    <h1>ES6</h1>
-    <div id="map" style="width: 100%; height: 400px;"></div>
-    <button class="btn">Click Me</button>
-    
-    <script type="module" src="js/map-controller.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="css/style.css" />
+        <title>ES6</title>
+    </head>
+    <body>
+        <header class="flex main-layout">
+            <h1 class="logo">TravelTip</h1>
+            <div class="search-location">
+                <input type="text" name="" id="" />
+                <button>GO</button>
+            </div>
+            <button>My Location</button>
+        </header>
+        <section class="location-info main-layout flex space-around">
+            <label for="">Location:</label>
+            <button>Copy Location</button>
+        </section>
+
+        <section class="main-content flex main-layout">
+            <div class="first-panel flex col">
+                <div class="weather-panel">todo weather</div>
+                <div class="locations">todo locations</div>
+            </div>
+            <div class="second-panel" id="map"></div>
+        </section>
+        <button class="btn">Click Me</button>
+
+        <script type="module" src="js/map-controller.js"></script>
+    </body>
 </html>
