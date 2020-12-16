@@ -6,6 +6,10 @@ window.onload = () => {
     initMap()
         .then(() => {
             addMarker({ lat: 32.0749831, lng: 34.9120554 });
+            const urlParams = new URLSearchParams(window.location.search);
+            const lat = urlParams.get('lat');
+            const lng = urlParams.get('lng');
+            if (lat && lng) panTo(lat, lng);
         })
         .catch((err) => {
             console.log('INIT MAP ERROR');
@@ -96,6 +100,14 @@ export function initMap(lat = 32.0749831, lng = 34.9120554) {
             locationService.addLocation(ev.latLng.lat(), ev.latLng.lng());
             addMarker(ev.latLng);
             renderTable();
+            locationService
+                .getLocationByCoord(ev.latLng)
+                .then(
+                    (res) =>
+                        (document.querySelector('.my-location').innerText =
+                            `Location: ` +
+                            res.data.results[0].formatted_address)
+                );
         });
     });
 }
@@ -123,7 +135,7 @@ function getUserPosition() {
 
 function _connectGoogleApi() {
     if (window.google) return Promise.resolve();
-    const API_KEY = 'AIzaSyA9krZ02aDNloGSkQmiwb-2XLuChoMHJh4'; //TODO: Enter your API Key
+    const API_KEY = 'AIzaSyA9krZ02aDNloGSkQmiwb-2XLuChoMHJh4';
     var elGoogleApi = document.createElement('script');
     elGoogleApi.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}`;
     elGoogleApi.async = true;
