@@ -27,13 +27,16 @@ window.onload = () => {
     locationService.getLocations()
         .then(locations => {
             renderLocations(locations)
-            document.querySelector('.go-btn').addEventListener('click', ev => {
-                console.log('in', ev);
-                onGoTo(ev.dateSet.lat, ev.dateSet.lng)
+            document.querySelectorAll('.go-btn').map(btn => {
+                return btn.addEventListener('click', ev => {
+                    onGoTo(ev.dateSet.lat, ev.dateSet.lng)
+                })
             })
-        
-            document.querySelector('.delete-btn').addEventListener('click', ev => {
-                onDelete(ev.dateSet.idx)
+
+            document.querySelectorAll('.delete-btn').map(btn => {
+                return btn.addEventListener('click', ev => {
+                    onDelete(ev.dateSet.idx)
+                })
             })
         })
 
