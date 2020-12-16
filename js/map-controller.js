@@ -1,7 +1,5 @@
 import { locationService } from './services/location-service.js';
 
-console.log('locationService', locationService);
-
 let gGoogleMap;
 
 window.onload = () => {
@@ -9,55 +7,96 @@ window.onload = () => {
         .then(() => {
             addMarker({ lat: 32.0749831, lng: 34.9120554 });
         })
-        .catch(console.log('INIT MAP ERROR'));
-
-    getUserPosition()
-        .then((pos) => {
-            console.log('User position is:', pos.coords);
-        })
         .catch((err) => {
-            console.log('err!!!', err);
+            console.log('INIT MAP ERROR');
+            console.log(err);
         });
 
+    document.querySelector('.my-location-btn').addEventListener('click', () => {
+        getUserPosition()
+            .then((pos) => {
+                console.log('User position is:', pos.coords);
+                panTo(pos.coords.latitude, pos.coords.longitude);
+            })
+            .catch((err) => {
+                console.log('err!!!', err);
+            });
+    });
     document.querySelector('.btn').addEventListener('click', (ev) => {
         console.log('Aha!', ev.target);
         panTo(35.6895, 139.6917);
     });
+    document
+        .querySelector('.locations-form')
+        .addEventListener('submit', (ev) => {
+            ev.preventDefault();
+            onSearch(document.querySelector('.locations-input').value);
+        });
+    const btn = document.querySelector('.copy-url-btn');
+    btn.addEventListener('click', () => {
+        copyUrl();
+        console.log('copied');
+        console.log(window.location.href);
+    });
 
-    locationService.getLocations()
-        .then(locations => {
-            renderLocations(locations)
-            document.querySelectorAll('.go-btn').map(btn => {
-                return btn.addEventListener('click', ev => {
-                    onGoTo(ev.dateSet.lat, ev.dateSet.lng)
-                })
-            })
-
-            document.querySelectorAll('.delete-btn').map(btn => {
-                return btn.addEventListener('click', ev => {
-                    onDelete(ev.dateSet.idx)
-                })
-            })
-        })
-
-
+    renderTable();
 };
 
+function copyUrl() {
+    let dummy = document.createElement('input');
+    const text = window.location.href;
 
+    document.body.appendChild(dummy);
+    dummy.value = text + `?lat=${lat}&lng=${lng}`;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+}
+
+function onSearch(txt) {
+    locationService.getLocationByName(txt).then((res) => {
+        panTo(
+            res.data.results[0].geometry.location.lat,
+            res.data.results[0].geometry.location.lng
+        );
+        locationService.addLocation(
+            res.data.results[0].geometry.location.lat,
+            res.data.results[0].geometry.location.lng,
+            txt
+        );
+        renderTable();
+    });
+}
+
+function renderTable() {
+    locationService.getLocations().then((locations) => {
+        renderLocations(locations);
+        document.querySelectorAll('.go-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                panTo(+btn.dataset.lat, +btn.dataset.lng);
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                onDelete(+btn.dataset.idx);
+            });
+        });
+    });
+}
 
 export function initMap(lat = 32.0749831, lng = 34.9120554) {
     return _connectGoogleApi().then(() => {
         gGoogleMap = new google.maps.Map(document.querySelector('#map'), {
             center: { lat, lng },
-            zoom: 15,
+            zoom: 16,
         });
-        gGoogleMap.addListener('click', ev => {
+        gGoogleMap.addListener('click', (ev) => {
             // console.log('lat', ev.latLng.lat(), 'lng', ev.latLng.lng());
             locationService.addLocation(ev.latLng.lat(), ev.latLng.lng());
-
-            locationService.getLocations()
-                .then(locations => renderLocations(locations));
-        })
+            addMarker(ev.latLng);
+            renderTable();
+        });
     });
 }
 
@@ -71,8 +110,8 @@ function addMarker(loc) {
 }
 
 function panTo(lat, lng) {
-    var laLatLng = new google.maps.LatLng(lat, lng);
-    gGoogleMap.panTo(laLatLng);
+    const latLng = new google.maps.LatLng(lat, lng);
+    gGoogleMap.panTo(latLng);
 }
 
 function getUserPosition() {
@@ -96,7 +135,6 @@ function _connectGoogleApi() {
     });
 }
 
-
 function renderLocations(locations) {
     const strHtmls = locations.map((location, idx) => {
         return `
@@ -105,29 +143,21 @@ function renderLocations(locations) {
                     <td>${location.name}</td>
                     <td>${location.lat}</td>
                     <td>${location.lng}</td>
-                    <td><button class="go-btn" data-lat="${location.lat}" data-lng="${location.lng}" >Go!</button></td>
+                    <td><button class="go-btn" data-lat="${
+                        location.lat
+                    }" data-lng="${location.lng}" >Go!</button></td>
                     <td><button class="delete-btn" data-idx="${idx}">Delete</button></td>
                 </tr>
-              `
+              `;
         // <td>${location.weather}</td>
         // <td>${location.createdAt}<   /td>
         // <td>${location.updatedAt}</td>
-    })
+    });
     document.querySelector('.locations-data').innerHTML = strHtmls.join('');
-}
-
-function onGoTo(lat, lng) {
-    console.log('lat', lat);
-    initMap(lat, lng);
 }
 
 function onDelete(idx) {
     locationService.deleteLocation(idx);
 
-    locationService.getLocations()
-        .then(locations => renderLocations(locations));
+    renderTable();
 }
-
-
-
-
