@@ -47,7 +47,7 @@ function copyUrl() {
     const text = window.location.href;
 
     document.body.appendChild(dummy);
-    dummy.value = text + `?lat=${lat}&lng=${lng}`;
+    dummy.value = text + `?lat=29.557669&lng=34.951925`;
     dummy.select();
     document.execCommand('copy');
     document.body.removeChild(dummy);
