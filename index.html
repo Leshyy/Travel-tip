@@ -1,34 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="css/style.css" />
-        <title>ES6</title>
-    </head>
-    <body>
-        <header class="flex main-layout">
-            <h1 class="logo">TravelTip</h1>
-            <div class="search-location">
-                <input type="text" name="" id="" />
-                <button>GO</button>
-            </div>
-            <button>My Location</button>
-        </header>
-        <section class="location-info main-layout flex space-around">
-            <label for="">Location:</label>
-            <button>Copy Location</button>
-        </section>
 
-        <section class="main-content flex main-layout">
-            <div class="first-panel flex col">
-                <div class="weather-panel">todo weather</div>
-                <div class="locations">todo locations</div>
-            </div>
-            <div class="second-panel" id="map"></div>
-        </section>
-        <button class="btn">Click Me</button>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>ES6</title>
+</head>
 
-        <script type="module" src="js/map-controller.js"></script>
-    </body>
+<body>
+    <header class="flex main-layout">
+        <h1 class="logo">TravelTip</h1>
+        <div class="search-location">
+            <input type="text" name="" id="" />
+            <button>GO</button>
+        </div>
+        <button>My Location</button>
+    </header>
+    <section class="location-info main-layout flex space-around">
+        <label for="">Location:</label>
+        <button>Copy Location</button>
+    </section>
+
+    <section class="main-content flex main-layout">
+        <div class="first-panel flex col">
+            <div class="weather-panel">todo weather</div>
+            <div class="locations">
+                <table class="locations-table" border="1">
+                    <thead>
+                        <tr>
+                            <td>ID</td>
+                            <td>Name</td>
+                            <td>Lat</td>
+                            <td>Lng</td>
+                            <!-- <td>Weather</td>
+                            <td>CreatedAt</td>
+                            <td>updatedAt</td> -->
+                            <td colspan="2">Actions</td>
+                        </tr>
+                    </thead>
+                    <tbody class="locations-data"></tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="second-panel" id="map"></div>
+    </section>
+    <button class="btn">Click Me</button>
+
+    <script type="module" src="js/map-controller.js"></script>
+</body>
+
 </html>

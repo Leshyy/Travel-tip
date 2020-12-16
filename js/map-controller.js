@@ -2,7 +2,7 @@ import { locationService } from './services/location-service.js';
 
 console.log('locationService', locationService);
 
-var gGoogleMap;
+let gGoogleMap;
 
 window.onload = () => {
     initMap()
@@ -23,17 +23,38 @@ window.onload = () => {
         console.log('Aha!', ev.target);
         panTo(35.6895, 139.6917);
     });
+
+    locationService.getLocations()
+        .then(locations => {
+            renderLocations(locations)
+            document.querySelector('.go-btn').addEventListener('click', ev => {
+                console.log('in', ev);
+                onGoTo(ev.dateSet.lat, ev.dateSet.lng)
+            })
+        
+            document.querySelector('.delete-btn').addEventListener('click', ev => {
+                onDelete(ev.dateSet.idx)
+            })
+        })
+
+
 };
 
+
+
 export function initMap(lat = 32.0749831, lng = 34.9120554) {
-    console.log('InitMap');
     return _connectGoogleApi().then(() => {
-        console.log('google available');
         gGoogleMap = new google.maps.Map(document.querySelector('#map'), {
             center: { lat, lng },
             zoom: 15,
         });
-        console.log('Map!', gGoogleMap);
+        gGoogleMap.addListener('click', ev => {
+            // console.log('lat', ev.latLng.lat(), 'lng', ev.latLng.lng());
+            locationService.addLocation(ev.latLng.lat(), ev.latLng.lng());
+
+            locationService.getLocations()
+                .then(locations => renderLocations(locations));
+        })
     });
 }
 
@@ -71,3 +92,39 @@ function _connectGoogleApi() {
         elGoogleApi.onerror = () => reject('Google script failed to load');
     });
 }
+
+
+function renderLocations(locations) {
+    const strHtmls = locations.map((location, idx) => {
+        return `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${location.name}</td>
+                    <td>${location.lat}</td>
+                    <td>${location.lng}</td>
+                    <td><button class="go-btn" data-lat="${location.lat}" data-lng="${location.lng}" >Go!</button></td>
+                    <td><button class="delete-btn" data-idx="${idx}">Delete</button></td>
+                </tr>
+              `
+        // <td>${location.weather}</td>
+        // <td>${location.createdAt}<   /td>
+        // <td>${location.updatedAt}</td>
+    })
+    document.querySelector('.locations-data').innerHTML = strHtmls.join('');
+}
+
+function onGoTo(lat, lng) {
+    console.log('lat', lat);
+    initMap(lat, lng);
+}
+
+function onDelete(idx) {
+    locationService.deleteLocation(idx);
+
+    locationService.getLocations()
+        .then(locations => renderLocations(locations));
+}
+
+
+
+
